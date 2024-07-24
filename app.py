@@ -5,7 +5,7 @@ app = Flask(__name__)
 CORS(app)
 
 items = [
-    {"id": i, "name": f"Элемент {i}", "category": "Category A" if i % 2 == 0 else "Category B", "description": f"Максимально полное описание элемента {i}. Деталей очень много"} for i in range(1, 100)
+    {"id": i, "name": f"Элемент {i}", "category": "Category A" if i % 2 == 0 else "Category B", "description": f"Максимально полное описание элемента {i}. Много дополнительного описания."} for i in range(1, 100)
 ]
 
 @app.route('/items', methods=['GET'])
