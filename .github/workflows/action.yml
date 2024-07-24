@@ -10,12 +10,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
 
     # Install python
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v1
+    - name: Set up Python
+      uses: actions/setup-python@v3
       with:
         python-version: 3.11
 
@@ -28,11 +29,11 @@ jobs:
     # Build the site
     - name: Build the site
       run: |
-        python -m app.py
+        python app.py
 
     # Push the page's HTML to github-pages
     - name: GitHub Pages action
-      uses: kikirilll/poc_list_elements@1.0.0
+      uses: peaceiris/actions-gh-pages@v3
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./_build/
+        publish_dir: ./poc
