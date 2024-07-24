@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список элементов</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        #itemList {
+            margin-top: 20px;
+        }
+        .item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+            cursor: pointer;
+        }
+        .item:hover {
+            background-color: #f0f0f0;
+        }
+        #pagination {
+            margin-top: 20px;
+        }
+        #pagination button {
+            margin: 2px;
+            padding: 5px 10px;
+        }
+    </style>
+    <script>
+        let items = [];
+        let filteredItems = [];
+        let currentPage = 1;
+        const itemsPerPage = 10;
+
+        // Fetch list items from backend
+        async function fetchItems() {
+            const response = await fetch('http://localhost:5000/items');
+            items = await response.json();
+            filteredItems = items;
+            renderItems();
+        }
+
+        function renderItems() {
+            const listContainer = document.getElementById('itemList');
+            listContainer.innerHTML = '';
+
+            const start = (currentPage - 1) * itemsPerPage;
+            const end = start + itemsPerPage;
+            const paginatedItems = filteredItems.slice(start, end);
+
+            paginatedItems.forEach(item => {
+                const listItem = document.createElement('div');
+                listItem.className = 'item';
+                listItem.textContent = item.name;
+                listItem.onclick = () => showDetails(item.id);
+                listContainer.appendChild(listItem);
+            });
+
+            renderPagination();
+        }
+
+        function renderPagination() {
+            const paginationContainer = document.getElementById('pagination');
+            paginationContainer.innerHTML = '';
+            const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+
+            for (let i = 1; i <= totalPages; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.textContent = i;
+                pageButton.onclick = () => {
+                    currentPage = i;
+                    renderItems();
+                };
+                paginationContainer.appendChild(pageButton);
+            }
+        }
+
+        function filterItems(category) {
+            filteredItems = items.filter(item => item.category === category);
+            currentPage = 1;
+            renderItems();
+        }
+
+        function sortItems(order) {
+            if (order === 'asc') {
+                filteredItems.sort((a, b) => a.name.localeCompare(b.name));
+            } else {
+                filteredItems.sort((a, b) => b.name.localeCompare(a.name));
+            }
+            renderItems();
+        }
+
+        function clearFilters() {
+            filteredItems = items;
+            currentPage = 1;
+            renderItems();
+        }
+
+        function showDetails(itemId) {
+            window.parent.postMessage({ type: 'showDetails', id: itemId }, '*');
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'filter') {
+                filterItems(event.data.category);
+            } else if (event.data.type === 'sort') {
+                sortItems(event.data.order);
+            } else if (event.data.type === 'clearFilters') {
+                clearFilters();
+            }
+        });
+
+        window.onload = fetchItems;
+    </script>
+</head>
+<body>
+    <div id="itemList"></div>
+    <div id="pagination"></div>
+</body>
+</html>

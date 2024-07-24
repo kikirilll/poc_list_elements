@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Список</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        iframe {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            width: 100%;
+            height: 600px;
+        }
+        .filters {
+            margin-bottom: 20px;
+        }
+        .filters button {
+            margin: 5px;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .filters button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Список элементов</h1>
+    <div class="filters">
+        <button onclick="filterItems('Category A')">Четные</button>
+        <button onclick="filterItems('Category B')">Нечетные</button>
+        <button onclick="sortItems('asc')">По возрастанию</button>
+        <button onclick="sortItems('desc')">По убыванию</button>
+        <button onclick="clearFilters()">X</button>
+    </div>
+    <iframe id="contentFrame" src="list.html"></iframe>
+
+    <script>
+        function filterItems(category) {
+            document.getElementById('contentFrame').contentWindow.postMessage({ type: 'filter', category: category }, '*');
+        }
+
+        function sortItems(order) {
+            document.getElementById('contentFrame').contentWindow.postMessage({ type: 'sort', order: order }, '*');
+        }
+
+        function clearFilters() {
+            document.getElementById('contentFrame').contentWindow.postMessage({ type: 'clearFilters' }, '*');
+        }
+
+        window.addEventListener('message', function(event) {
+            if (event.data.type === 'showDetails') {
+                document.getElementById('contentFrame').src = 'details.html?id=' + event.data.id;
+            } else if (event.data.type === 'goBack') {
+                document.getElementById('contentFrame').src = 'list.html';
+            }
+        });
+    </script>
+</body>
+</html>
