@@ -25,6 +25,8 @@ jobs:
         python -m pip install -U pip
         python -m pip install -U flask
         python -m pip install -U flask_cors
+        python -m pip install -U invoke
+
 
     # Build the site
     - name: Build the site
